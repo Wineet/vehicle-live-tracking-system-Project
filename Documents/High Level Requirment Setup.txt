@@ -1,0 +1,13 @@
+# High Level Customer Requirment 
+
+>> Geo-Fence Feature and Live tracking should be there
+
+# Detailed Requirment Setup for Product
+
+>> Live vehicle tracking Application or Server Based
+>> Request Based Location Providing
+>> Geo Fence implementation for circle Only
+		> SMS based Perimeter Location Set
+		> App Based Perimeter Setting And ack reception by SMS Only
+		> Square or other shape perimeter Setting 
+>> Vehicle theft identification (In case of towing )
