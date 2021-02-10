@@ -24,8 +24,10 @@ using namespace std;
 #include"vehicle_tracking_func_decl.h"
 
 /* User Defined Macro */
-#define FILE_NAME "/home/vinit/vinit/sample.txt"
 
+
+//#define FILE_NAME "/home/vinit/vinit/sample.txt"
+#define FILE_NAME "/home/vinit/demo.txt"
 
 static status_t tx_modem_cmd( char *cmd_arg);
 static status_t rx_modem_resp(char *resp_buffer,int resp_size);

@@ -6,10 +6,12 @@
 #include<cstring>
 #include<unistd.h>
 #include<fstream>
-
+#include<string.h>
 
 #include "class_decl.h"
-
+#define SPECIAL_FILE
+//#define NORMAL_FILE
+#define FILE_CHAR_SIZE 1
 /*
  *  read_data_from_file
  *  Functionality:
@@ -25,9 +27,33 @@
  *  Function Return Number bytes read From File
  */
 
-status_t read_data_from_file(const char *file_name, char *read_data_buff, int bytes_to_read)
+status_t read_data_from_file(const char *file_name, char *read_data_buff, int bytes_to_read) 
 {
     status_t ret = SUCCESS;
+ #ifdef SPECIAL_FILE
+    FILE *file_ptr  = NULL;
+    int  read_bytes = 0,read_ret=0;
+    file_ptr=fopen(file_name,"r+");
+   //  cout<<"FILE name "<<file_name<<endl;
+    if(NULL==file_ptr)
+    {
+         cout<<"FILE open Failed "<<__LINE__<<strerror(errno)<<endl;
+         ret = FAIL;
+         return ret;
+    }
+    fseek(file_ptr,0,SEEK_SET);
+    do
+    {
+         read_ret = fread(read_data_buff+read_bytes,FILE_CHAR_SIZE,1,file_ptr);
+         read_bytes += read_ret;
+        //cout<<"read_ret "<<read_ret<<endl;
+    }
+    while(0 != read_ret);
+    cout<<"No bytes read"<<read_bytes<<endl;
+    fclose(file_ptr);
+ #endif
+
+ #ifdef NORMAL_FILE
     ifstream file_read;
     file_read.open(file_name,ios::in);
     if(file_read.fail())
@@ -43,6 +69,8 @@ status_t read_data_from_file(const char *file_name, char *read_data_buff, int by
         ret = FAIL;
     }
     file_read.close();
+ #endif
+
     return ret;
 }
 
@@ -65,13 +93,39 @@ status_t read_data_from_file(const char *file_name, char *read_data_buff, int by
 
 status_t write_data_to_file(const char *file_name, char *write_data_buff)
 {
-    ofstream file_write;
     status_t ret = SUCCESS;
+
+ #ifdef SPECIAL_FILE
+    FILE *file_ptr  = NULL;
+    int  write_bytes = 0,write_ret=0;
+    file_ptr=fopen(file_name,"a+");
+   //  cout<<"FILE name "<<file_name<<endl;
+    if(NULL==file_ptr)
+    {
+         cout<<"FILE open Failed "<<__LINE__<<strerror(errno)<<endl;
+         ret = FAIL;
+         return ret;
+    }
+    fseek(file_ptr,0,SEEK_SET);
+   // rewind(file_ptr);
+    write_bytes=strlen(write_data_buff);
+    
+    for(int i=0;i<=write_bytes;i++)
+    {
+         write_ret = fwrite(write_data_buff+i,FILE_CHAR_SIZE,1,file_ptr);
+     //    write_bytes += read_ret;
+    }
+    fclose(file_ptr);
+ #endif
+
+ #ifdef NORMAL_FILE
+
 //    file_write.open(file_name,ios::out|ios::app|ios::nocreate);
 //    ios::nocreate Doesnot exist in standard C++ libraray so following Below Work around
 //    To avoide Creating a new Empty File
 
 //>> File is available or not Work around
+    ofstream file_write;
     ifstream file_check;
     file_check.open(file_name);
     if(file_check.fail())
@@ -97,5 +151,6 @@ status_t write_data_to_file(const char *file_name, char *write_data_buff)
         ret = FAIL;
     }
     file_write.close();
+#endif
     return ret;
 }
