@@ -12,6 +12,7 @@
 #define SPECIAL_FILE
 //#define NORMAL_FILE
 #define FILE_CHAR_SIZE 1
+#define FILE_READ_SIZE 512
 /*
  *  read_data_from_file
  *  Functionality:
@@ -34,22 +35,21 @@ status_t read_data_from_file(const char *file_name, char *read_data_buff, int by
     FILE *file_ptr  = NULL;
     int  read_bytes = 0,read_ret=0;
     file_ptr=fopen(file_name,"r+");
-   //  cout<<"FILE name "<<file_name<<endl;
+     cout<<"FILE name "<<file_name<<endl;
     if(NULL==file_ptr)
     {
          cout<<"FILE open Failed "<<__LINE__<<strerror(errno)<<endl;
          ret = FAIL;
          return ret;
     }
-    fseek(file_ptr,0,SEEK_SET);
-    do
-    {
-         read_ret = fread(read_data_buff+read_bytes,FILE_CHAR_SIZE,1,file_ptr);
-         read_bytes += read_ret;
-        //cout<<"read_ret "<<read_ret<<endl;
-    }
-    while(0 != read_ret);
-    cout<<"No bytes read"<<read_bytes<<endl;
+    //fseek(file_ptr,0,SEEK_SET);
+    
+        char data_buff[1024]={0};
+        fread(data_buff,FILE_READ_SIZE,1,file_ptr);
+
+        //read_bytes += read_ret;
+       // cout<<"read_ret "<<read_ret<<endl;
+        cout<<" bytes read"<<data_buff<<endl;
     fclose(file_ptr);
  #endif
 

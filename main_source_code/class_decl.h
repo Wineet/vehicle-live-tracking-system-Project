@@ -3,7 +3,7 @@
 
 
 using namespace std;
-typedef enum{SUCCESS=0, FAIL=1,TRUE=0,FALSE =1}status_t;
+typedef enum{INVALID=-1,SUCCESS=0, FAIL=1,BYTES_READ=1,BYTES_NOT_READ=3}status_t;
 typedef void *(*thread_routine)(void *);
 
 class Thread{
