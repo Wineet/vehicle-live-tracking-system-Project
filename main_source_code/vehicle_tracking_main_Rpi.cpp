@@ -112,7 +112,7 @@ void *tx_thread(void * arg)
     {
          cin.getline(tx_trans_buff,sizeof(tx_trans_buff)-1);
 #ifdef RPI_SERIAL_LIB_USE
-        serialPrintf(serialFd_write,cmd_arg);
+        serialPrintf(serialFd_write,tx_trans_buff);
 #endif
 
 #ifdef RPI_SERIAL_FILE_USE
@@ -132,6 +132,7 @@ void *tx_thread(void * arg)
 void *rx_thread(void * arg)
 {
     status_t thread_running = SUCCESS;
+    status_t ret = SUCCESS;
     Thread *rx_obj = new Thread;
     char rx_resp_buff[MAX_RX_RESP_BUFF]={0};
     memcpy(rx_obj,arg,sizeof(Thread));
@@ -152,7 +153,6 @@ void *rx_thread(void * arg)
     while( SUCCESS == thread_running)
     {
 #ifdef RPI_SERIAL_LIB_USE
-        status_t ret = SUCCESS;
         status_t read_status=INVALID;
         if( 0 < ( bytes_to_read=serialDataAvail(serialFd_read)) )
         {
@@ -162,11 +162,12 @@ void *rx_thread(void * arg)
             }
             read_status = BYTES_READ;
             cout<<"read Data bytes "<<bytes_to_read<<resp_buff<<endl;
-            if(bytes_to_read > resp_size)
+            if(bytes_to_read > MAX_RX_RESP_BUFF)
             {
                 cout<<"Data Trucated "<<bytes_to_read<<resp_buff<<endl;
                 ret = FAIL;
             }
+
            // memcpy(resp_buffer,resp_buff,bytes_to_read > 1023 ?1023:bytes_to_read);
         }
         else
@@ -174,7 +175,7 @@ void *rx_thread(void * arg)
             read_status = BYTES_NOT_READ;
             cout<<"No Data to read"<<endl;
         }
-        
+        sleep(1);
         #endif
 
 #if RPI_SERIAL_FILE_USE
@@ -227,10 +228,14 @@ static status_t rx_modem_resp(char *resp_buffer,int resp_size)
 void signal_handler(int arg)
 {
     cout<<"CTRL+c signal Handler"<<endl;
-
+    cout<<"closed all Files"<<endl;
 #ifdef RPI_SERIAL_LIB_USE
     serialClose(serialFd_read);
     serialClose(serialFd_write);
+    exit(1);
+    
+    /* Thread Cancel or changing thread running Variable Won't work
+     * Because of software design Limitation */
 #endif
 
 }
