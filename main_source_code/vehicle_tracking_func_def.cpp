@@ -13,6 +13,10 @@
 //#define NORMAL_FILE
 #define FILE_CHAR_SIZE 1
 #define FILE_READ_SIZE 512
+
+ extern FILE *file_ptr_write  ;
+ extern FILE *file_ptr_read   ;
+ 
 /*
  *  read_data_from_file
  *  Functionality:
@@ -32,25 +36,25 @@ status_t read_data_from_file(const char *file_name, char *read_data_buff, int by
 {
     status_t ret = SUCCESS;
  #ifdef SPECIAL_FILE
-    FILE *file_ptr  = NULL;
+  
     int  read_bytes = 0,read_ret=0;
-    file_ptr=fopen(file_name,"r+");
+    file_ptr_read=fopen(file_name,"r+");
      cout<<"FILE name "<<file_name<<endl;
-    if(NULL==file_ptr)
+    if(NULL==file_ptr_read)
     {
          cout<<"FILE open Failed "<<__LINE__<<strerror(errno)<<endl;
          ret = FAIL;
-         return ret;
+         exit(1);
     }
     //fseek(file_ptr,0,SEEK_SET);
     
         char data_buff[1024]={0};
-        fread(data_buff,FILE_READ_SIZE,1,file_ptr);
+        fread(data_buff,FILE_READ_SIZE,1,file_ptr_read);
 
         //read_bytes += read_ret;
        // cout<<"read_ret "<<read_ret<<endl;
         cout<<" bytes read"<<data_buff<<endl;
-    fclose(file_ptr);
+   
  #endif
 
  #ifdef NORMAL_FILE
@@ -90,32 +94,31 @@ status_t read_data_from_file(const char *file_name, char *read_data_buff, int by
  *  Function Return Number bytes read From File
  *  Note: Function will not create a new File if file is not Present (Designed as per requirement) 
  */
-
 status_t write_data_to_file(const char *file_name, char *write_data_buff)
 {
     status_t ret = SUCCESS;
 
  #ifdef SPECIAL_FILE
-    FILE *file_ptr  = NULL;
+   
     int  write_bytes = 0,write_ret=0;
-    file_ptr=fopen(file_name,"a+");
+    file_ptr_write=fopen(file_name,"a+");
    //  cout<<"FILE name "<<file_name<<endl;
-    if(NULL==file_ptr)
+    if(NULL==file_ptr_write)
     {
          cout<<"FILE open Failed "<<__LINE__<<strerror(errno)<<endl;
          ret = FAIL;
-         return ret;
+         exit(1);
     }
-    fseek(file_ptr,0,SEEK_SET);
+    fseek(file_ptr_write,0,SEEK_SET);
    // rewind(file_ptr);
     write_bytes=strlen(write_data_buff);
     
     for(int i=0;i<=write_bytes;i++)
     {
-         write_ret = fwrite(write_data_buff+i,FILE_CHAR_SIZE,1,file_ptr);
+         write_ret = fwrite(write_data_buff+i,FILE_CHAR_SIZE,1,file_ptr_write);
      //    write_bytes += read_ret;
     }
-    fclose(file_ptr);
+    
  #endif
 
  #ifdef NORMAL_FILE

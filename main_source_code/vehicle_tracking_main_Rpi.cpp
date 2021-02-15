@@ -18,22 +18,13 @@
 #include<unistd.h>
 #include<signal.h>
 
-/*Pi UART Libraries*/
-#include<wiringPi.h>
-#include<wiringSerial.h>
-
-using namespace std;
-
-/* User Defined Files */
-#include"class_decl.h"
-#include"vehicle_tracking_func_decl.h"
 
 /* User Defined Macro */
 #define RPI_SERIAL_LIB_USE
 #define RPI_SERIAL_FILE_USE
 
-//#undef RPI_SERIAL_LIB_USE
-#undef RPI_SERIAL_FILE_USE
+#undef RPI_SERIAL_LIB_USE
+//#undef RPI_SERIAL_FILE_USE
 
 #define RX_THREAD_ACTIVE
 #define TX_THREAD_ACTIVE
@@ -41,11 +32,31 @@ using namespace std;
 //#undef RX_THREAD_ACTIVE
 //#undef TX_THREAD_ACTIVE
 
+#define FILE_NAME "/dev/serial0"
+
+/*Pi UART Libraries*/
+#ifdef RPI_SERIAL_LIB_USE
+#include<wiringPi.h>
+#include<wiringSerial.h>
+#endif
+
+using namespace std;
+
+/* User Defined Files */
+#include"class_decl.h"
+#include"vehicle_tracking_func_decl.h"
+
+
 /* Global Varibales */
+#ifdef RPI_SERIAL_LIB_USE
 static int serialFd_write = 0;
 static int serialFd_read  = 0;
+#endif
+#ifdef RPI_SERIAL_FILE_USE
+ FILE *file_ptr_write  = NULL;
+ FILE *file_ptr_read  = NULL;
+#endif
 
-#define FILE_NAME "/dev/serial0"
 
 typedef void (*sighandler_t)(int);
 
@@ -178,7 +189,7 @@ void *rx_thread(void * arg)
         sleep(1);
         #endif
 
-#if RPI_SERIAL_FILE_USE
+#ifdef RPI_SERIAL_FILE_USE
         cout.flush();
         memset(rx_resp_buff,0,sizeof(rx_resp_buff));
         if(FAIL == rx_modem_resp(rx_resp_buff,MAX_RX_RESP_BUFF-1) )
@@ -229,6 +240,8 @@ void signal_handler(int arg)
 {
     cout<<"CTRL+c signal Handler"<<endl;
     cout<<"closed all Files"<<endl;
+    fclose(file_ptr_read);
+    fclose(file_ptr_write);
 #ifdef RPI_SERIAL_LIB_USE
     serialClose(serialFd_read);
     serialClose(serialFd_write);
