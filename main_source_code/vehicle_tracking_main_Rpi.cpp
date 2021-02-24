@@ -23,8 +23,8 @@
 #define RPI_SERIAL_LIB_USE
 #define RPI_SERIAL_FILE_USE
 
-#undef RPI_SERIAL_LIB_USE
-//#undef RPI_SERIAL_FILE_USE
+//#undef RPI_SERIAL_LIB_USE
+#undef RPI_SERIAL_FILE_USE
 
 #define RX_THREAD_ACTIVE
 #define TX_THREAD_ACTIVE
@@ -121,7 +121,11 @@ void *tx_thread(void * arg)
     cout<<"Tx thread Running"<<endl;    
     while( SUCCESS == thread_running)
     {
-         cin.getline(tx_trans_buff,sizeof(tx_trans_buff)-1);
+        memset(tx_trans_buff,0,MAX_TX_TRANS_BUFF);
+        cin.getline(tx_trans_buff,sizeof(tx_trans_buff)-1);
+        cout<<" Tx Command"<<tx_trans_buff<<"end"<<endl;
+        tx_trans_buff[strlen(tx_trans_buff)+0]='\r';
+        tx_trans_buff[strlen(tx_trans_buff)+1]='\n';
 #ifdef RPI_SERIAL_LIB_USE
         serialPrintf(serialFd_write,tx_trans_buff);
 #endif
@@ -165,6 +169,7 @@ void *rx_thread(void * arg)
     {
 #ifdef RPI_SERIAL_LIB_USE
         status_t read_status=INVALID;
+        memset(resp_buff,0,sizeof(resp_buff));
         if( 0 < ( bytes_to_read=serialDataAvail(serialFd_read)) )
         {
             for(int i =0;i<bytes_to_read && i < 1024 ;i++)
@@ -172,7 +177,7 @@ void *rx_thread(void * arg)
                 resp_buff[i]=serialGetchar(serialFd_read);
             }
             read_status = BYTES_READ;
-            cout<<"read Data bytes "<<bytes_to_read<<resp_buff<<endl;
+            cout<<"No read Data bytes= "<<bytes_to_read<<" Data= "<<resp_buff<<endl;
             if(bytes_to_read > MAX_RX_RESP_BUFF)
             {
                 cout<<"Data Trucated "<<bytes_to_read<<resp_buff<<endl;
@@ -184,7 +189,7 @@ void *rx_thread(void * arg)
         else
         {
             read_status = BYTES_NOT_READ;
-            cout<<"No Data to read"<<endl;
+        //    cout<<"No Data to read"<<endl;
         }
         sleep(1);
         #endif
@@ -240,15 +245,15 @@ void signal_handler(int arg)
 {
     cout<<"CTRL+c signal Handler"<<endl;
     cout<<"closed all Files"<<endl;
+#ifdef RPI_SERIAL_FILE_USE
     fclose(file_ptr_read);
     fclose(file_ptr_write);
+#endif
 #ifdef RPI_SERIAL_LIB_USE
     serialClose(serialFd_read);
     serialClose(serialFd_write);
-    exit(1);
-    
     /* Thread Cancel or changing thread running Variable Won't work
      * Because of software design Limitation */
 #endif
-
+    exit(1);
 }

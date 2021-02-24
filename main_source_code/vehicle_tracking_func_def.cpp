@@ -14,9 +14,10 @@
 #define FILE_CHAR_SIZE 1
 #define FILE_READ_SIZE 512
 
+#ifdef RPI_SERIAL_FILE_USE
  extern FILE *file_ptr_write  ;
  extern FILE *file_ptr_read   ;
- 
+#endif
 /*
  *  read_data_from_file
  *  Functionality:
@@ -35,11 +36,11 @@
 status_t read_data_from_file(const char *file_name, char *read_data_buff, int bytes_to_read) 
 {
     status_t ret = SUCCESS;
- #ifdef SPECIAL_FILE
-  
+ #ifdef SPECIAL_FILE 
+ #ifdef RPI_SERIAL_FILE_USE
     int  read_bytes = 0,read_ret=0;
     file_ptr_read=fopen(file_name,"r+");
-     cout<<"FILE name "<<file_name<<endl;
+    cout<<"FILE name "<<file_name<<endl;
     if(NULL==file_ptr_read)
     {
          cout<<"FILE open Failed "<<__LINE__<<strerror(errno)<<endl;
@@ -54,10 +55,11 @@ status_t read_data_from_file(const char *file_name, char *read_data_buff, int by
         //read_bytes += read_ret;
        // cout<<"read_ret "<<read_ret<<endl;
         cout<<" bytes read"<<data_buff<<endl;
-   
+ #endif
  #endif
 
  #ifdef NORMAL_FILE
+ #ifdef RPI_SERIAL_FILE_USE
     ifstream file_read;
     file_read.open(file_name,ios::in);
     if(file_read.fail())
@@ -73,8 +75,8 @@ status_t read_data_from_file(const char *file_name, char *read_data_buff, int by
         ret = FAIL;
     }
     file_read.close();
- #endif
-
+#endif
+#endif
     return ret;
 }
 
@@ -98,8 +100,8 @@ status_t write_data_to_file(const char *file_name, char *write_data_buff)
 {
     status_t ret = SUCCESS;
 
- #ifdef SPECIAL_FILE
-   
+ #ifdef SPECIAL_FILE 
+ #ifdef RPI_SERIAL_FILE_USE
     int  write_bytes = 0,write_ret=0;
     file_ptr_write=fopen(file_name,"a+");
    //  cout<<"FILE name "<<file_name<<endl;
@@ -119,10 +121,11 @@ status_t write_data_to_file(const char *file_name, char *write_data_buff)
      //    write_bytes += read_ret;
     }
     
- #endif
+#endif
+#endif
 
- #ifdef NORMAL_FILE
-
+#ifdef NORMAL_FILE
+#ifdef RPI_SERIAL_FILE_USE
 //    file_write.open(file_name,ios::out|ios::app|ios::nocreate);
 //    ios::nocreate Doesnot exist in standard C++ libraray so following Below Work around
 //    To avoide Creating a new Empty File
@@ -154,6 +157,7 @@ status_t write_data_to_file(const char *file_name, char *write_data_buff)
         ret = FAIL;
     }
     file_write.close();
+#endif
 #endif
     return ret;
 }
