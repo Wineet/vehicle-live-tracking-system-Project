@@ -1,0 +1,154 @@
+****SIM 808 Info *****
+
+TCP/IP protocol and extended TCP/IP AT commands which are very useful for data transfer
+applications. For details about TCP/IP applications
+
+GPS Bluetooth GSM engine available.
+
+**** Power Modes *****
+
+Sleep : In sleep mode, the module can still receive paging message and SMS
+Idle: Software is active. Module registered to the GSM network, and the module is ready to communicate.
+
+
+Power Down: Normal power down by sending the AT command “AT+CPOWD=1” or using the PWRKEY.
+The power management unit shuts down the power supply for the baseband part of the
+module, and only the power supply for the RTC is remained. Software is not active. The
+serial port is not accessible. Power supply (connected to VBAT) remains applied.
+
+Minumum Modem Func: AT command “AT+CFUN” can be used to set the module to a minimum functionality mode
+without removing the power supply. In this mode, the RF part of the module will not work or
+the SIM card will not be accessible, or both RF part and SIM card will be closed, and the
+serial port is still accessible. The power consumption in this mode is lower than normal
+mode.
+
+ AT+CFUN=0: minimum functionality.
+ AT+CFUN=1: full functionality (default).
+ AT+CFUN=4: flight mode (disable RF function).
+
+
+When the GPS function is shut off, user can control SIM808 module to enter or exit the sleep mode
+(AT+CSCLK=1) by DTR signal. When DTR is in high level and without interrupt (on air and hardware such as
+GPIO interrupt or data in serial port), SIM808 will enter sleep mode automatically. In this mode, SIM808 can still
+receive paging or SMS from network but the serial port is not accessible.
+Note: For SIM808, it requests to set AT command “AT+CSCLK=1” and ensure DTR at high level to enable the sleep mode ; the
+default value is 0, which can not make the module to enter sleep mode.
+
+sleep wakeup:
+
+When SIM808 is in sleep mode (AT+CSCLK=1), the following methods can wake up the module:
+1 Pull down DTR pin. The serial port will be active after DTR pin is pulled to low level for about 50ms.
+2 Receive a voice or data call from network.
+3 Receive a SMS from network.
+4 Receive external interrupt
+5 Charge VBUS pin
+
+*****************************
+I/O Information
+
+PWRKEY should be pulled low at least 1 second and then released to power on/down the module.
+
+Programmable GPIO5, GPIO6 (pin no 43&44) Pull down on reset
+The output voltage level of the GPIO can be set by the AT command “AT+SGPIO”. The input voltage level of the GPIO can also be read by the AT command “AT+ SGPIO”
+
+NETLIGHT pin No. 50 Output --> Network status
+STATUS pin No. 49   Output --> Power on status 
+
+“AT+CADC” to read the voltage value Max range 2.8v prceision 20mV
+ADC1 ADC2 Pin No. 23 & 24 (10 bit ADC)
+
+PWM output frequency varies from 0 to 2KHz.Two 7-bit unsigned binary parameters are used for the output
+period and for the duty cycle. The AT command “AT + SPWM” is used to set the output period and duty cycle of
+the PWM.
+
+PWM1 PWM2  Pin No.42 & 41
+
+******************************
+
+Module Power up & communication
+
+When power on procedure is completed, SIM808 will send following URC to indicate that the module is ready to
+operate at fixed baud rate.
+
+URC --> "RDY"
+
+This URC does not appear when autobauding function is active.
+
+User can use AT command “AT+IPR=x” to set a fixed baud rate and save the configuration to non-volatile flash memory.
+After the configuration is saved as fixed baud rate, the Code “RDY” should be received from the serial port every time when
+SIM808 is powered on.
+
+The default setting is autobauding.
+
+--> Auto Baud Rate
+AT+IPR=0
+OK
+--> Setting to 115200
+AT+IPR=115200
+
+The DTE serial port must be set at 8 data bits, no parity and 1 stop bit.
+
+
+SIM808 also has a RESET pin (pin 16) used to reset the module. This function is used as an emergency reset
+only when AT command “AT+CPOWD=1” and the POWER_ON pin has no effect. User can pull the RESET pin
+to ground, then the module will rese
+
+Restrictions of autobauding operation:
+The DTE serial port must be set at 8 data bits, no parity and 1 stop bit.
+The URC such as "RDY", "+CFUN: 1" and "+CPIN: READY” will not be reported.
+
+
+Status of the NETLIGHT pin
+Status SIM808 behavior
+Off SIM808 is not running
+64ms On/ 800ms Off SIM808 not registered the network
+64ms On/ 3000ms Off SIM808 registered to the network
+64ms On/ 300ms Off PPP GPRS communication is established
+
+********************************
+
+Parameter Saving Mode
+
+For the purposes of the present document, the following syntactical definitions apply:
+NO_SAVE: The parameter of the current AT command will be lost if module is rebooted or current AT command doesn't have parameter.
+
+AUTO_SAVE: The parameter of the current AT command will be kept in NVRAM automatically, and it won't be lost if module is rebooted.
+
+AT&W_SAVE: The parameter of the current AT command will be kept in NVRAM by sending the command of “AT&W.”
+
+
+*********************************
+
+Data terminal equipment (DTE) ex: terminal, computer, printer
+data circuit-terminating equipment (DCE)
+URC (Unsolicited Result Code)
+
+When DCE powers on with autobauding enabled, firstly, user must send character “A” or “a” to
+synchronize the baud rate. It is recommended to send “AT” until DTE receives the “OK” response, which
+means DTE and DCE are correctly synchronized.
+
+
+The DTE serial port must be set at 8 data bits, no parity and 1 stop bit.
+
+
+***********************************
+
+GPS Mode
+
+Active mode: GPS is active as a GPS receiver. The GPS engine will automatically acquire and track GPS
+satellites.
+Power down mode: The GPS engine will be set into this mode by sending AT command “AT+CGPSPWR=0”. In
+this mode the internal power supply for GPS will be shutdown, and the current consumption is very low. The last
+position, current time and ephemeris data will be stored in the GSM host memory.
+
+User can power on GPS engine by sending AT command “AT+CGPSPWR=1”
+User can power down GPS engine by sending AT command “AT+CGPSPWR=0”
+
+******************************************
+Other Info
+
+The 3rd Generation Partnership Project (3GPP) unites [Seven] telecommunications standard development organizations (ARIB, ATIS, CCSA, ETSI, TSDSI, TTA, TTC), known as “Organizational Partners” and provides their members with a stable environment to produce the Reports and Specifications that define 3GPP technologies.
+
+PDP (Packet Data Protocol): he PDP addresses are network layer addresses (Open Standards Interconnect [OSI] model Layer 3).
+GPRS systems support both X.25 and IP network layer protocols
+

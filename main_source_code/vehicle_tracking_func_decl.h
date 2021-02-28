@@ -8,7 +8,8 @@
 
 status_t write_data_to_file(const char *file_name, char *write_data_buff);
 status_t read_data_from_file(const char *file_name, char *read_data_buff, int bytes_to_read);
-
+void send_at_cmd(char *arg);
+char *parse_at_output(char *resp_buff, int bytes_to_parse);
 
 
 

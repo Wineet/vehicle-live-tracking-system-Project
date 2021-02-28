@@ -1,0 +1,79 @@
+
+*** AT Command Routine ***
+
+AT+CGPSPWR=? --> GPS Mode  returns the current value of GPS Power Control PIN 
+
+Turn On GPS
+AT+CGPSPWR=1 --> Turn on GPS power supply
+
+
+GPS Reset Mode (COLD /HOT/WARM)
+
+
+
+**** Get GPS Location ***
+TA returns the current successful GPS location info. This command should be executed after the GPS locating successfully. 
+AT+CGPSINF=
+
+
+
+<mode>,<longitude>,<latitude>,<altitude>,<UTC time>,<TTFF>,<num>,<speed>,<course >
+
+
+
+
+******* GPS status *******
+
+AT+CGPSSTATUS? 
+
+GPS Fix Status Parameters   <status>    is a string value"Location Unknown": if GPS is not run  
+"Location Not Fix": after GPS is run ,and haven’t fixed 
+"Location 2D Fix" :after GPS status is 2D fixed 
+"Location 3D Fix" : after GPS status is 3D fixed 
+
+
+****************************
+CME Modem GPS related error code
+
+The following errors are related to GPS. The format is like this: +CME ERROR: <err>. 
+The detail error code and description is list in the following table.
+ CodeDescription 
+ 890 GPS not running 
+ 891 GPS is running 
+ 892 GPS is fixing 
+ 
+ 
+ ************* GNSS chip ************
+ 
+ 
+ AT+CGNSPWR?
+ Tx CommandAT+CGNSPWR?end
+No read Data bytes= 33 Data= AT+CGNSPWR?
++CGNSPWR: 1
+
+OK
+
+AT+CGNSINF
+ Tx CommandAT+CGNSINFend
+No read Data bytes= 121 Data= AT+CGNSINF
++CGNSINF: 1,1,20210223171830.000,18.518507,73.866988,566.100,0.02,129.6,1,,0.8,2.1,1.9,,12,10,,,39,,
+
+OK
+
+
+GNSS AT command is as follows: 
+AT+CGNSPWRGNSS --> power controlAT+CGNSSEQ Define the last NMEA sentence that parsed 
+AT+CGNSINF GNSS navigation information parsed from NMEA sentences 
+AT+CGNSURC GNSS navigation, GEO-fence and speed alarm URC report control 
+AT+CGNSCMD Send command to GNSS NEMA
+AT+CGNSTST Send data received from GNSS to AT UART
+
+
+Time to first fix (TTFF) is a measure of the time required for a GPS navigation device to acquire satellite signals and navigation data, and calculate a position solution (called a fix).
+
+
+AT+CGNSURC for updating URC on fix periodicity
+
+
+
+ 

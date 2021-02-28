@@ -161,3 +161,19 @@ status_t write_data_to_file(const char *file_name, char *write_data_buff)
 #endif
     return ret;
 }
+
+
+/* Generoc Function for Data Parsing */
+
+
+char *parse_at_output(char *resp_buff, int bytes_to_parse)
+{
+    char dum_buff[1024]={0};
+    char *dum_ptr=NULL;
+    memcpy(dum_buff,resp_buff,bytes_to_parse);
+
+    dum_ptr=(char *)strstr("\r\n",(const char *)dum_buff);
+    dum_ptr+=2; // to move further "\r\n"
+    cout<<"dum_ptr = "<<dum_ptr<<endl;
+return resp_buff;
+}

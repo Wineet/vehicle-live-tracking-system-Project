@@ -90,9 +90,9 @@ int main()
 
     if(FAIL==main_obj.create_thread(main_thread,&main_obj))
     { 
-	main_obj.cancel_thread();
+	    main_obj.cancel_thread();
         cout<<"Thread Creation Failed "<<__LINE__<<endl;
-	return 1;
+	    return 1;
     }
     signal(SIGINT,signal_handler);
 #ifdef  TX_THREAD_ACTIVE
@@ -184,13 +184,13 @@ void *rx_thread(void * arg)
                 resp_buff[i]=serialGetchar(serialFd_read);
             }
             read_status = BYTES_READ;
-            cout<<"No read Data bytes= "<<bytes_to_read<<" Data= "<<resp_buff<<endl;
+            cout<<"read Data bytes= "<<bytes_to_read<<" \nData= "<<resp_buff<<endl;
             if(bytes_to_read > MAX_RX_RESP_BUFF)
             {
                 cout<<"Data Trucated "<<bytes_to_read<<resp_buff<<endl;
                 ret = FAIL;
             }
-
+            parse_at_output(resp_buff,bytes_to_read);
            // memcpy(resp_buffer,resp_buff,bytes_to_read > 1023 ?1023:bytes_to_read);
         }
         else
@@ -220,13 +220,16 @@ void *rx_thread(void * arg)
 
 void *main_thread(void *arg)
 {
+    sleep(1);
     status_t thread_running = SUCCESS;
     status_t ret = SUCCESS;
     Thread *main_obj = new Thread;
     memcpy(main_obj,arg,sizeof(Thread));
+    cout<<"main_thread Running"<<endl;
     while(thread_running)
     {
-    
+        sleep(1);
+        send_at_cmd("AT\r\n");
 
 
     }
@@ -278,4 +281,12 @@ void signal_handler(int arg)
      * Because of software design Limitation */
 #endif
     exit(1);
+}
+
+
+/* Send AT command */
+/* Modem Specific Functions */
+void send_at_cmd(char *arg)
+{
+    serialPrintf(serialFd_write,arg);
 }

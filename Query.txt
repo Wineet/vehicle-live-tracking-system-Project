@@ -1,0 +1,4 @@
+Query:
+
+GNSS and GPS difference
+NEMA commands
