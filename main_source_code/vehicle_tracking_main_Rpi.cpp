@@ -65,11 +65,12 @@ static status_t rx_modem_resp(char *resp_buffer,int resp_size);
 void signal_handler(int);
 void *tx_thread(void *arg);
 void *rx_thread(void *arg);
+void *main_thread(void *arg);
 
 int main()
 {
     cout<<"vehicle tracking Program started"<<endl;
-    Thread tx_obj,rx_obj;
+    Thread tx_obj,rx_obj,main_obj;
 #ifdef  TX_THREAD_ACTIVE
     if( FAIL == tx_obj.create_thread(tx_thread,&tx_obj))
     {
@@ -87,6 +88,12 @@ int main()
     }
 #endif
 
+    if(FAIL==main_obj.create_thread(main_thread,&main_obj))
+    { 
+	main_obj.cancel_thread();
+        cout<<"Thread Creation Failed "<<__LINE__<<endl;
+	return 1;
+    }
     signal(SIGINT,signal_handler);
 #ifdef  TX_THREAD_ACTIVE
      pthread_join(tx_obj.get_thread_id(),NULL);
@@ -211,6 +218,21 @@ void *rx_thread(void * arg)
     return NULL;
 }
 
+void *main_thread(void *arg)
+{
+    status_t thread_running = SUCCESS;
+    status_t ret = SUCCESS;
+    Thread *main_obj = new Thread;
+    memcpy(main_obj,arg,sizeof(Thread));
+    while(thread_running)
+    {
+    
+
+
+    }
+
+return NULL
+}
 /* Thread Routine End*/
 
 /* Thread Function call */
