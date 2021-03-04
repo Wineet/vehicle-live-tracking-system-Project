@@ -4,7 +4,25 @@
 
 using namespace std;
 typedef enum{INVALID=-1,SUCCESS=0, FAIL=1,BYTES_READ=1,BYTES_NOT_READ=3}status_t;
-typedef enum{INVALID=-1,OK=0,ERROR}at_return_t;
+typedef enum{OK=0,ERROR}at_return_t;
+typedef enum {
+    INVALID_HEADER,
+    CGNSINF,
+    COPS,
+    CSQ
+}cmd_resp_header_e;
+
+typedef struct _at_resp_data{
+        char cmd_state[10];
+        struct {
+                double lat;       
+                double lon;
+                double alt;
+                char date[25];
+        }gps_data;
+        
+}at_resp_data;
+
 typedef void *(*thread_routine)(void *);
 
 /*AT COMMAND strcture To handle all possible Output and it's value

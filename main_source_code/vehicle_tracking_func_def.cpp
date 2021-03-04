@@ -166,14 +166,110 @@ status_t write_data_to_file(const char *file_name, char *write_data_buff)
 /* Generoc Function for Data Parsing */
 
 
+
+cmd_resp_header_e get_header_enum(char *arg_header)
+{
+    if(0 == strcmp(arg_header,"+CGNSINF"))
+        return CGNSINF;
+    else if(0 == strcmp(arg_header,"+COPS"))
+        return COPS;
+    else if(0 == strcmp(arg_header,"+CSQ"))
+        return CSQ;
+    else
+        return INVALID_HEADER;
+}
+at_resp_data resp_data={0};
+
+
+void fill_at_response(char *arg_header,char *arg_body)
+{
+    char body_parts[20][20]={0};
+    switch(get_header_enum(arg_header))
+    {
+        case CGNSINF:
+        {
+         char *token=NULL;
+         int i=0;
+        // cout<<"CGNSINF Enum"<<endl;
+         token=strtok(arg_body,",");
+         if(token == NULL)
+         {
+            cout<<"ERROR No token Found"<<endl;
+            return;
+         }
+         strncpy(body_parts[i],token,20);
+         while(NULL !=(token=strtok(NULL,",")) )
+         {
+            strncpy(body_parts[++i],token,20);    
+         }
+         if( 1 == atof(body_parts[0]) && 1 == atof(body_parts[0]) )
+         {
+            resp_data.gps_data.lat = atof(body_parts[3]);
+            resp_data.gps_data.lon = atof(body_parts[4]);
+            resp_data.gps_data.alt = atof(body_parts[5]);
+            strncpy(resp_data.gps_data.date,body_parts[2],25);
+            cout<<"GPS Latched lat "<<resp_data.gps_data.lat<<" lon"<< resp_data.gps_data.lon <<endl;
+         }
+         else
+         {
+             cout<<"GPS Not Latched"<<endl;
+         }
+        
+         break;
+        }    
+        case COPS:
+        {
+          cout<<"COPS Enum "<<endl;
+          
+          break;
+        }    
+        case CSQ:
+        {
+            cout<<"CSQ Enum"<<endl;
+            break;
+        }   
+        default:
+        cout<<"Invalid Enum"<<endl;
+        break;
+    }
+}
 char *parse_at_output(char *resp_buff, int bytes_to_parse)
 {
     char dum_buff[1024]={0};
     char *dum_ptr=NULL;
+    char cmd_header[20]={0};
+    char *_header_ptr =NULL;
+    char cmd_body[512]={0};
+ // at_resp_data resp_data={0};
+ //   cout<<"resp Buff "<<resp_buff<<endl;
     memcpy(dum_buff,resp_buff,bytes_to_parse);
-
-    dum_ptr=(char *)strstr("\r\n",(const char *)dum_buff);
+ //   cout<<"dum Buff "<<dum_buff<<endl;
+    dum_ptr=(char *)strstr(dum_buff,"\r\n");
+    if(dum_ptr == NULL)
+    {
+    	cout<<"Parsing Failed"<<endl;
+   	return NULL; 
+    }
     dum_ptr+=2; // to move further "\r\n"
-    cout<<"dum_ptr = "<<dum_ptr<<endl;
+ //   cout<<"dum_ptr = "<<dum_ptr<<endl;
+    _header_ptr = strchr(dum_ptr,':');
+    if(NULL == _header_ptr)
+    {
+        if (NULL != strstr(dum_ptr,"OK"))
+        {
+            strcpy(resp_buff,"OK");
+            cout<<"Resp " << resp_buff<<endl;
+            return resp_buff;
+        }
+        cout<<"Can't Parse No Header"<<dum_ptr<<endl;
+        return NULL; 
+    }
+    memcpy(cmd_header,dum_ptr,_header_ptr-dum_ptr);
+    //cout<<"_header_ptr = "<<cmd_header<<endl;
+    //cout<<"cmd_header = "<<cmd_header<<endl;
+    strcpy(cmd_body,_header_ptr+1);
+    //cout<<"cmd_body = "<<cmd_body<<endl;
+    
+    fill_at_response(cmd_header,cmd_body);
 return resp_buff;
 }

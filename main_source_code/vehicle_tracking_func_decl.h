@@ -8,8 +8,10 @@
 
 status_t write_data_to_file(const char *file_name, char *write_data_buff);
 status_t read_data_from_file(const char *file_name, char *read_data_buff, int bytes_to_read);
-void send_at_cmd(char *arg);
+void send_at_cmd(const char *arg);
 char *parse_at_output(char *resp_buff, int bytes_to_parse);
+void fill_at_response(char *arg_header,char *arg_body);
+cmd_resp_header_e get_header_enum(char *arg_header);
 
 
 
